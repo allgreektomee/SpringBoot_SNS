@@ -5,10 +5,12 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
+
 
 @Component
 public class SnsDAO {
@@ -29,21 +31,38 @@ public class SnsDAO {
 	}
 	
 	
-	public void addPost(Sns n) throws Exception {
+	public Long addPost(Sns n) throws Exception {
 		Connection conn = open();
 		
 		String sql = "insert into sns(title,img,date,content) values(?,?,CURRENT_TIMESTAMP(),?)";
-		PreparedStatement pstmt = conn.prepareStatement(sql);
+//		PreparedStatement pstmt = conn.prepareStatement(sql);
+		PreparedStatement pstmt = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
 	
+		Long sid = (long) -10;
 		
 		try(conn; pstmt) {
 			pstmt.setString(1, n.getTitle());
 			pstmt.setString(2, n.getImg());
 			pstmt.setString(3, n.getContent());
 			pstmt.executeUpdate();
+			
+			
+			//insert 후 sns sid 가져오기 
+			ResultSet rs = pstmt.getGeneratedKeys();
+
+			if (rs.next()) {
+				
+				sid = rs.getLong(1);
+		
+				return sid;
+			}
+
 		}
 		
+		return sid;
+		
 	}
+
 	
 
 	public List<Sns> getAllPost() throws Exception {
@@ -96,7 +115,7 @@ public class SnsDAO {
 	public void delPost(int sid) throws SQLException {
 		Connection conn = open();
 		
-		String sql = "delete from sns where sid=?";
+		String sql = "delete from sns where sid = ?";
 		PreparedStatement pstmt = conn.prepareStatement(sql);
 		
 		try(conn; pstmt) {
@@ -123,4 +142,64 @@ public class SnsDAO {
 		}
 		
 	}
+	
+	// 
+	// 다중파일 업로드 
+	//
+	public void addFile(String fileName, String fileCode) throws Exception {
+		Connection conn = open();
+		
+		String sql = "insert into file(filename,filecode) values(?,?)";
+		PreparedStatement pstmt = conn.prepareStatement(sql);
+	
+		
+		try(conn; pstmt) {
+			pstmt.setString(1, fileName);
+			pstmt.setString(2, fileCode);
+			pstmt.executeUpdate();
+		}
+		
+	}
+	
+	public List<String> getImgaes(String fileCode) throws Exception {
+		Connection conn = open();
+		List<String> newsList = new ArrayList<>();
+		
+		
+		String sql = "select filename from file where filecode = ?";
+		PreparedStatement pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, fileCode);
+		ResultSet rs = pstmt.executeQuery();
+		
+		try(conn; pstmt; rs) {
+			while(rs.next()) {
+				
+				newsList.add(fileCode+"/"+rs.getString("filename"));
+			}
+			return newsList;			
+		}
+	}
+	
+	public void delFile(String fileCode) throws SQLException {
+		Connection conn = open();
+		
+		String sql = "delete from file where filecode = ?";
+		PreparedStatement pstmt = conn.prepareStatement(sql);
+		
+		try(conn; pstmt) {
+			pstmt.setString(1, fileCode);
+			// 삭제된 post 없을 경우
+			if(pstmt.executeUpdate() == 0) {
+				throw new SQLException("DB에러");
+			}
+		}
+	}
 }
+
+/* 파일 테이블 추가 
+ Create table file(
+	id INT NOT NULL AUTO_INCREMENT,
+	filename VARCHAR NOT NULL  PRIMARY KEY,
+	filecode VARCHAR NOT NULL
+)
+*/
