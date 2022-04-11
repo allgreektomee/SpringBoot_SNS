@@ -1,5 +1,7 @@
 package com.sns.board;
 
+
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -57,71 +59,114 @@ public class SnsRestController {
 	
 	//등록 
 	@PostMapping
-	public String addSns(@RequestBody Sns sns) {
+	public ResponseDTO<Object> addSns(@RequestBody Sns sns) {
+		ResponseDTO<Object> responseDTO = new ResponseDTO<Object>();
+		String result = "";
 		
 		try {
 			dao.addPost(sns);
 		}catch(Exception e){
 			e.printStackTrace();
-			
-			return "addSns fail";
+			result =  "sns 등록 실패 ";
 		}
 		
-		return "sns 등록";
+		result =  "sns 등록";
+		
+		responseDTO.setResultCode("0000");
+		responseDTO.setResultMsg(result);
+		
+		return responseDTO;
 	}
 	
 	
 	//전체목록 
 	@GetMapping
-	public List<Sns> listSns() {
+	public ResponseDTO<Object>  listSns() {
+		ResponseDTO<Object> responseDTO = new ResponseDTO<Object>();
+		HashMap<String,Object> hasMap = new HashMap<>();
+		String result = "";
+		
 		List<Sns> list = null;
 		try {
 			list = dao.getAllPost();
+			hasMap.put("list", list);
+			
 		}catch(Exception e){
 			e.printStackTrace();
+			result ="실패  msg";
 		}
+		result = "성공 msg";
+		responseDTO.setResultCode("0000");
+		responseDTO.setResultMsg(result);
+		responseDTO.setHasmap(hasMap);
 		
-		return list;
+		return responseDTO;
 	}
 	
 	//목록 
 	@GetMapping("/{sid}")
-	public Sns getSns(@PathVariable int sid) {
+	public ResponseDTO<Object>  getSns(@PathVariable int sid) {
+		ResponseDTO<Object> responseDTO = new ResponseDTO<Object>();
+		HashMap<String,Object> hasMap = new HashMap<>();
+		
+		String result = "";
 		Sns sns = null;
 		
 		try {
 			sns = dao.getPost(sid);
+			hasMap.put("sns", sns);
 		}catch(Exception e){
 			e.printStackTrace();
+			result ="실패  msg";
 		}
+		result = "성공 msg";
+		responseDTO.setResultCode("0000");
+		responseDTO.setResultMsg(result);
+		responseDTO.setHasmap(hasMap);
+		return responseDTO;
 		
-		return sns;
 		
 	}
 	
 	//삭제 
 	@DeleteMapping("{sid}")
-	public String deleteSns(@PathVariable("sid") int sid) {
+	public ResponseDTO<Object>  deleteSns(@PathVariable("sid") int sid) {
+		ResponseDTO<Object> responseDTO = new ResponseDTO<Object>();
+		String result = "";
+		
 		try {
 			dao.delPost(sid);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "sns 삭제 오류 ! - "+ sid;
+			result = e.getLocalizedMessage();
 		}
-		return "sns 삭제 ";
+		result = " 성공";
+		responseDTO.setResultCode("0000");
+		responseDTO.setResultMsg(result);
+		
+		return responseDTO;
 	}
 	
 	//수정 
 	@PatchMapping("{sid}")
-	public String updateSns(@RequestBody Sns sns ,@PathVariable("sid") int sid ){
+	public ResponseDTO<Object> updateSns(@RequestBody Sns sns ,@PathVariable("sid") int sid ){
+		
+		ResponseDTO<Object> responseDTO = new ResponseDTO<Object>();
+		String result = "";
+		
 		try {
 			dao.updatePost(sns, sid);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "sns 업데이트 오류 ! - "+ sid;
+			result = "업데이트 실패 ";
 		}
-		return "sns 업데이트 ";
 		
+		
+		result = "업데이트 성공";
+		responseDTO.setResultCode("0000");
+		responseDTO.setResultMsg(result);
+		
+		return responseDTO;
 	}
 	
 	
@@ -129,8 +174,11 @@ public class SnsRestController {
 	// 다중파일 업로드 
 	//
 	@PostMapping("/m")
-	public String addSns2(@ModelAttribute Sns sns, @RequestParam("files") ArrayList<MultipartFile> files) {
+	public ResponseDTO<Object> addSns2(@ModelAttribute Sns sns, @RequestParam("files") ArrayList<MultipartFile> files) {
+		
 		String filename = "";
+		ResponseDTO<Object> responseDTO = new ResponseDTO<Object>();
+		String result = "";
 		try {
 			/*파일 이름만 저장, 이미지 저장 경로로 접근 (image/파일명)  */ 
 //			String fcode = UUID.randomUUID().toString(); // 랜덤 UUID 3470bf91-f8b0-4774-958f-5848302f0fcb
@@ -189,11 +237,12 @@ public class SnsRestController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.info("addPost 오류");
-			return "addPost 오류 ";
+			result =  "addPost 오류 ";
 		}
-		
-		
-		return "http://localhost:8080/api/sns/img/"+filename;
+		result = "http://localhost:8080/api/sns/img/"+filename;
+		responseDTO.setResultCode("0000");
+		responseDTO.setResultMsg(result);
+		return responseDTO;
 	}
 	
 	// 이미지 다운로드 
@@ -250,9 +299,9 @@ public class SnsRestController {
 	}
 	
 	@GetMapping("/m/{sid}")
-	public HashMap<String, Object> getSns2(@PathVariable int sid) {
+	public ResponseDTO<Object> getSns2(@PathVariable int sid) {
 		HashMap<String,Object> hasMap = new HashMap<>();
-    	
+    
 		List<String> list;
 		try {
 			Sns sns = dao.getPost(sid);
@@ -263,10 +312,15 @@ public class SnsRestController {
 			hasMap.put("imglist", list);
 		} catch (Exception e) {
 			e.printStackTrace();
-			
-			
 		}
-		return hasMap;
+		
+		ResponseDTO<Object> responseDTO = new ResponseDTO<Object>();
+		
+		responseDTO.setResultCode("0000");
+		responseDTO.setResultMsg("msg");
+		responseDTO.setHasmap(hasMap);
+		
+		return responseDTO;
 	}
 	
 
