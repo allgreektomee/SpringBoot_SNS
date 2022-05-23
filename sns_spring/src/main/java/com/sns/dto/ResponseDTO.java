@@ -1,4 +1,4 @@
-package com.sns.board;
+package com.sns.dto;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,8 +8,7 @@ public class ResponseDTO<T> {
 	private String resultCode; 
 	private String resultMsg;
 	
-	private List<T> list;
-	private HashMap<String, T> hasmap;
+	private HashMap<String, T> resultData;
 	
 
 	public String getResultCode() {
@@ -28,21 +27,16 @@ public class ResponseDTO<T> {
 		this.resultMsg = resultMsg;
 	}
 
-	public List<T> getList() {
-		return list;
+	public HashMap<String, T> getResultData() {
+		return resultData;
 	}
 
-	public void setList(List<T> list) {
-		this.list = list;
+	public void setResultData(HashMap<String, T> resultData) {
+		this.resultData = resultData;
 	}
 
-	public HashMap<String, T> getHasmap() {
-		return hasmap;
-	}
 
-	public void setHasmap(HashMap<String, T> hasmap) {
-		this.hasmap = hasmap;
-	}
+
 	
 	
 	

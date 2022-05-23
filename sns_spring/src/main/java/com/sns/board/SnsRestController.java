@@ -32,6 +32,9 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.sns.dto.ResponseDTO;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -61,6 +64,7 @@ public class SnsRestController {
 	@PostMapping
 	public ResponseDTO<Object> addSns(@RequestBody Sns sns) {
 		ResponseDTO<Object> responseDTO = new ResponseDTO<Object>();
+		HashMap<String,Object> hasMap = new HashMap<>();
 		String result = "";
 		
 		try {
@@ -74,6 +78,7 @@ public class SnsRestController {
 		
 		responseDTO.setResultCode("0000");
 		responseDTO.setResultMsg(result);
+		responseDTO.setResultData(hasMap);
 		
 		return responseDTO;
 	}
@@ -89,7 +94,7 @@ public class SnsRestController {
 		List<Sns> list = null;
 		try {
 			list = dao.getAllPost();
-			hasMap.put("list", list);
+			hasMap.put("snslist", list);
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -98,7 +103,8 @@ public class SnsRestController {
 		result = "성공 msg";
 		responseDTO.setResultCode("0000");
 		responseDTO.setResultMsg(result);
-		responseDTO.setHasmap(hasMap);
+		responseDTO.setResultData(hasMap);
+
 		
 		return responseDTO;
 	}
@@ -122,7 +128,7 @@ public class SnsRestController {
 		result = "성공 msg";
 		responseDTO.setResultCode("0000");
 		responseDTO.setResultMsg(result);
-		responseDTO.setHasmap(hasMap);
+		responseDTO.setResultData(hasMap);
 		return responseDTO;
 		
 		
@@ -239,14 +245,15 @@ public class SnsRestController {
 			logger.info("addPost 오류");
 			result =  "addPost 오류 ";
 		}
-		result = "http://localhost:8080/api/sns/img/"+filename;
+//		result = "http://localhost:8080/api/sns/img/"+filename;
+		result = "addPost 완료";
 		responseDTO.setResultCode("0000");
 		responseDTO.setResultMsg(result);
 		return responseDTO;
 	}
 	
 	// 이미지 다운로드 
-	//	http://localhost:8080/image/"+filename
+	//	http://localhost:8080/api/sns/img/33484151-6adb-4fb6-bc08-04a56226536b_1_66.png
 	@GetMapping("/img/{filename}")
 	public ResponseEntity<Resource> getImg(@PathVariable String filename, HttpServletRequest request) {
 		
@@ -318,7 +325,7 @@ public class SnsRestController {
 		
 		responseDTO.setResultCode("0000");
 		responseDTO.setResultMsg("msg");
-		responseDTO.setHasmap(hasMap);
+		responseDTO.setResultData(hasMap);
 		
 		return responseDTO;
 	}
