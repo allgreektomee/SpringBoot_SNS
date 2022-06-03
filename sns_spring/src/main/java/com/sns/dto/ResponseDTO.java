@@ -8,8 +8,8 @@ public class ResponseDTO<T> {
 	private String resultCode; 
 	private String resultMsg;
 	
-	private HashMap<String, T> resultData;
-	
+	private List<T> resultData;
+	private HashMap<String,Object> resultMap;
 
 	public String getResultCode() {
 		return resultCode;
@@ -27,17 +27,27 @@ public class ResponseDTO<T> {
 		this.resultMsg = resultMsg;
 	}
 
-	public HashMap<String, T> getResultData() {
+	public List<T> getResultData() {
 		return resultData;
 	}
 
-	public void setResultData(HashMap<String, T> resultData) {
+	public void setResultData(List<T> resultData) {
 		this.resultData = resultData;
+	}
+
+	public HashMap<String, Object> getResultMap() {
+		return resultMap;
+	}
+
+	public void setResultMap(HashMap<String, Object> resultMap) {
+		this.resultMap = resultMap;
 	}
 
 
 
-	
+
+
+
 	
 	
 }

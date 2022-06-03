@@ -89,6 +89,32 @@ public class SnsDAO {
 		}
 	}
 	
+	public List<Sns2> getAllPostV2() throws Exception {
+		Connection conn = open();
+		List<Sns2> newsList = new ArrayList<>();
+		
+//		String sql = "select sid, title, PARSEDATETIME(date,'yyyy-MM-dd hh:mm:ss') as cdate from sns";
+		String sql = "select * from sns ORDER BY sid DESC";
+		PreparedStatement pstmt = conn.prepareStatement(sql);
+		ResultSet rs = pstmt.executeQuery();
+		
+		try(conn; pstmt; rs) {
+			while(rs.next()) {
+				Sns2 n = new Sns2();
+				n.setSid(rs.getInt("sid"));
+				n.setTitle(rs.getString("title"));
+				n.setDate(rs.getString("date")); 
+				n.setImg(rs.getString("img")); 
+				n.setContent(rs.getString("content")); 
+				n.setFiles(getImgaes(rs.getString("img")));
+				newsList.add(n);
+			}
+			return newsList;			
+		}
+	}
+	
+	
+	
 	public Sns getPost(int sid) throws SQLException {
 		Connection conn = open();
 		
@@ -174,11 +200,12 @@ public class SnsDAO {
 		try(conn; pstmt; rs) {
 			while(rs.next()) {
 				
-				newsList.add(fileCode+"/"+rs.getString("filename"));
+				newsList.add("/api/sns/img/"+rs.getString("filename"));
 			}
 			return newsList;			
 		}
 	}
+	
 	
 	public void delFile(String fileCode) throws SQLException {
 		Connection conn = open();
